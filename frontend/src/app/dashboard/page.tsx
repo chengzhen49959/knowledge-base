@@ -1,16 +1,8 @@
 import { redirect } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { type Me } from '@/lib/api'
-import { apiServer } from '@/lib/api-server'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { KnowledgeBoard } from '@/components/knowledge/knowledge-board'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,45 +13,22 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  let backend: { ok: true; me: Me } | { ok: false; error: string }
-  try {
-    backend = { ok: true, me: await apiServer<Me>('/api/me') }
-  } catch (e) {
-    backend = { ok: false, error: (e as Error).message }
-  }
-
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 p-6">
+    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <div>
+          <h1 className="text-2xl font-semibold">个人知识库</h1>
+          <p className="text-muted-foreground text-sm">{user.email}</p>
+        </div>
         <form action="/auth/signout" method="post">
           <Button variant="outline" size="sm" type="submit">
             <LogOut />
-            Sign out
+            退出登录
           </Button>
         </form>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Backend session</CardTitle>
-          <CardDescription>
-            Verified by FastAPI from your Supabase access token.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {backend.ok ? (
-            <p className="text-sm">
-              Signed in as{' '}
-              <span className="font-medium">
-                {backend.me.email ?? backend.me.id}
-              </span>
-            </p>
-          ) : (
-            <p className="text-destructive text-sm">{backend.error}</p>
-          )}
-        </CardContent>
-      </Card>
+      <KnowledgeBoard />
     </main>
   )
 }

@@ -75,6 +75,84 @@ class SupabaseConceptStore:
             .execute()
         )
 
+    def list_concepts(self) -> list[dict]:
+        response = (
+            self.client.table("concepts")
+            .select("id, name, description, created_at, updated_at, concept_sources(count)")
+            .order("updated_at", desc=True)
+            .execute()
+        )
+        return [
+            {
+                **{k: row[k] for k in ("id", "name", "description", "created_at", "updated_at")},
+                "source_count": row["concept_sources"][0]["count"] if row["concept_sources"] else 0,
+            }
+            for row in response.data
+        ]
+
+    def get_concept(self, concept_id: str) -> dict | None:
+        response = (
+            self.client.table("concepts")
+            .select(
+                "id, name, description, created_at, updated_at,"
+                " concept_sources(description, created_at,"
+                "  sources(id, title, source_type, origin, summary, created_at))"
+            )
+            .eq("id", concept_id)
+            .execute()
+        )
+        if not response.data:
+            return None
+        row = response.data[0]
+        return {
+            **{k: row[k] for k in ("id", "name", "description", "created_at", "updated_at")},
+            "sources": [
+                {**link["sources"], "concept_description": link["description"]}
+                for link in row["concept_sources"]
+            ],
+        }
+
+    def list_sources(self) -> list[dict]:
+        response = (
+            self.client.table("sources")
+            .select(
+                "id, title, source_type, origin, summary, created_at, concept_sources(count)"
+            )
+            .order("created_at", desc=True)
+            .execute()
+        )
+        return [
+            {
+                **{
+                    k: row[k]
+                    for k in ("id", "title", "source_type", "origin", "summary", "created_at")
+                },
+                "concept_count": row["concept_sources"][0]["count"] if row["concept_sources"] else 0,
+            }
+            for row in response.data
+        ]
+
+    def get_source(self, source_id: str) -> dict | None:
+        response = (
+            self.client.table("sources")
+            .select(
+                "id, title, source_type, origin, summary, created_at,"
+                " concept_sources(concepts(id, name, description))"
+            )
+            .eq("id", source_id)
+            .execute()
+        )
+        if not response.data:
+            return None
+        row = response.data[0]
+        return {
+            **{
+                k: row[k]
+                for k in ("id", "title", "source_type", "origin", "summary", "created_at")
+            },
+            "concepts": [link["concepts"] for link in row["concept_sources"]],
+        }
+
 
 def cosine_similarity(a: list[float], b: list[float]) -> float:
     dot = sum(x * y for x, y in zip(a, b))

@@ -1,0 +1,19 @@
+
+Ingest 1: /Users/gongchengzhen/Downloads/NIPS-2017-attention-is-all-you-need-Paper.pdf
+  summary: The document introduces the Transformer, a sequence transduction architecture that replaces recurrence and convolutions with attention alone. It argues that sel...
+  input: 556.1KB, parts: 1, time: 17.0s (extract 14.8, embed 2.2, dedup 0.0)
+  created (11): ['Transformer', 'Scaled dot-product attention', 'Multi-head attention', 'Encoder-decoder attention', 'Masked self-attention', 'Position-wise feed-forward network', 'Residual connection and layer normalization', 'Sinusoidal positional encoding', 'Byte-pair encoding', 'Learning rate warmup and inverse square-root decay', 'Label smoothing']
+  merged (0):
+
+Concepts in store: 11
+- Transformer: The Transformer is an encoder-decoder sequence transduction model built entirely from attention mechanisms, without recurrence or convolution. It uses stacked self-attention and feed-forward layers to model dependencies and generate outputs autoregressively.
+- Scaled dot-product attention: Scaled dot-product attention computes compatibility between queries and keys by taking their dot product, scaling by the square root of the key dimension, and applying softmax to obtain weights over values. The scaling helps prevent large dot products from pushing the softmax into low-gradient regions.
+- Multi-head attention: Multi-head attention runs several attention mechanisms in parallel on learned linear projections of the queries, keys, and values, then concatenates and projects the results. This lets the model attend to different representation subspaces and positions simultaneously.
+- Encoder-decoder attention: Encoder-decoder attention is the attention sub-layer in the decoder where queries come from the decoder state and keys and values come from the encoder output. It allows each decoder position to attend over the entire input sequence.
+- Masked self-attention: Masked self-attention is decoder self-attention that prevents a position from attending to future positions by masking illegal connections before the softmax. This preserves the autoregressive property so predictions depend only on earlier outputs.
+- Position-wise feed-forward network: A position-wise feed-forward network applies the same two-layer fully connected transformation independently to each sequence position, with a ReLU between the layers. In the Transformer it serves as a per-position nonlinearity after attention.
+- Residual connection and layer normalization: Each Transformer sub-layer is wrapped in a residual connection and followed by layer normalization. This stabilizes training and allows deep stacked attention and feed-forward layers to be optimized effectively.
+- Sinusoidal positional encoding: Sinusoidal positional encoding adds fixed sine and cosine vectors of different frequencies to token embeddings so the model can represent token order without recurrence or convolution. The encoding is designed so relative positions can be learned easily and may extrapolate to longer sequences.
+- Byte-pair encoding: Byte-pair encoding is used to segment text into subword units for the translation experiments, reducing vocabulary size while handling rare words more effectively. The paper uses a shared source-target vocabulary built from these subword tokens.
+- Learning rate warmup and inverse square-root decay: The training schedule increases the learning rate linearly for a warmup period and then decays it in proportion to the inverse square root of the step number. This schedule is paired with Adam to train the Transformer effectively.
+- Label smoothing: Label smoothing replaces hard one-hot targets with softened target distributions during training. It reduces overconfidence, hurts perplexity somewhat, but improves accuracy and BLEU.

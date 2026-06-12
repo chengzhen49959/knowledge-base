@@ -1,10 +1,16 @@
 from contextlib import asynccontextmanager
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+# The agents SDK reads OPENAI_API_KEY from the process environment, which
+# pydantic-settings does not populate — load the env files explicitly.
+load_dotenv()
+load_dotenv(".env.local")
+
 from app.config import get_settings
-from app.routers import health, me
+from app.routers import health, knowledge, me
 
 
 @asynccontextmanager
@@ -29,4 +35,5 @@ app.add_middleware(
 )
 
 app.include_router(health.router)
+app.include_router(knowledge.router)
 app.include_router(me.router)
